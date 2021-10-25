@@ -2,7 +2,7 @@ namespace: default
 bootstrapSecret: "properties-2021-05-10"
 
 image:
-  repository: localhost:5000/microservices-template
+  repository: localhost:5000/external-tools-report
   pullPolicy: Never
   tag: unstable
 

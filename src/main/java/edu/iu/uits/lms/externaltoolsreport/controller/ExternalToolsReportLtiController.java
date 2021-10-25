@@ -1,4 +1,4 @@
-package edu.iu.uits.lms.microservicestemplate.controller;
+package edu.iu.uits.lms.externaltoolsreport.controller;
 
 import canvas.helpers.CanvasConstants;
 import edu.iu.uits.lms.lti.LTIConstants;
@@ -24,14 +24,13 @@ import java.util.Map;
 @Controller
 @RequestMapping({"/lti"})
 @Slf4j
-public class MicroservicesTemplateLtiController extends LtiController {
+public class ExternalToolsReportLtiController extends LtiController {
 
     private boolean openLaunchUrlInNewWindow = false;
 
     @Override
     protected String getLaunchUrl(Map<String, String> launchParams) {
-        String courseId = launchParams.get(CUSTOM_CANVAS_COURSE_ID);
-        return "/app/index/" + courseId;
+        return "/app/index/";
     }
 
     @Override
@@ -41,9 +40,6 @@ public class MicroservicesTemplateLtiController extends LtiController {
         paramMap.put(CUSTOM_CANVAS_COURSE_ID, payload.get(CUSTOM_CANVAS_COURSE_ID));
         paramMap.put(BasicLTIConstants.ROLES, payload.get(BasicLTIConstants.ROLES));
         paramMap.put(CUSTOM_CANVAS_USER_LOGIN_ID, payload.get(CUSTOM_CANVAS_USER_LOGIN_ID));
-        paramMap.put(BasicLTIConstants.CONTEXT_TITLE, payload.get(BasicLTIConstants.CONTEXT_TITLE));
-        paramMap.put(BasicLTIConstants.LIS_PERSON_CONTACT_EMAIL_PRIMARY, payload.get(BasicLTIConstants.LIS_PERSON_CONTACT_EMAIL_PRIMARY));
-        paramMap.put(BasicLTIConstants.LIS_PERSON_SOURCEDID, payload.get(BasicLTIConstants.LIS_PERSON_SOURCEDID));
 
         openLaunchUrlInNewWindow = Boolean.valueOf(payload.get(CUSTOM_OPEN_IN_NEW_WINDOW));
 
@@ -58,16 +54,8 @@ public class MicroservicesTemplateLtiController extends LtiController {
         log.debug("LTI equivalent authority: " + authority);
 
         String userId = launchParams.get(CUSTOM_CANVAS_USER_LOGIN_ID);
-        String userEmail = launchParams.get(BasicLTIConstants.LIS_PERSON_CONTACT_EMAIL_PRIMARY);
-        String userSisId = launchParams.get(BasicLTIConstants.LIS_PERSON_SOURCEDID);
         String systemId = launchParams.get(BasicLTIConstants.TOOL_CONSUMER_INSTANCE_GUID);
         String courseId = launchParams.get(CUSTOM_CANVAS_COURSE_ID);
-        String courseTitle = launchParams.get(BasicLTIConstants.CONTEXT_TITLE);
-
-        HttpSession session = request.getSession();
-//        session.setAttribute(Constants.COURSE_TITLE_KEY, courseTitle);
-//        session.setAttribute(Constants.USER_EMAIL_KEY, userEmail);
-//        session.setAttribute(Constants.USER_SIS_ID_KEY, userSisId);
 
         LtiAuthenticationToken token = new LtiAuthenticationToken(userId,
                 courseId, systemId, AuthorityUtils.createAuthorityList(LtiAuthenticationProvider.LTI_USER_ROLE, authority), getToolContext());
@@ -76,7 +64,7 @@ public class MicroservicesTemplateLtiController extends LtiController {
 
     @Override
     protected String getToolContext() {
-        return "microservices-template";
+        return "lms_lti_external_tools_report";
     }
 
     @Override

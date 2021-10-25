@@ -1,4 +1,4 @@
-package edu.iu.uits.lms.microservicestemplate.config;
+package edu.iu.uits.lms.externaltoolsreport.config;
 
 import edu.iu.uits.lms.common.oauth.CustomJwtAuthenticationConverter;
 import edu.iu.uits.lms.lti.security.LtiAuthenticationProvider;
@@ -21,11 +21,11 @@ public class SecurityConfig {
         protected void configure(HttpSecurity http) throws Exception {
             http.authenticationProvider(new LtiAuthenticationProvider());
             http
-                  .requestMatchers().antMatchers("/lti", "/app/**")
-                  .and()
-                  .authorizeRequests()
-                  .antMatchers("/lti").permitAll()
-                  .antMatchers("/app/**").hasRole(LtiAuthenticationProvider.LTI_USER);
+                    .requestMatchers().antMatchers("/lti/**", "/app/**")
+                    .and()
+                    .authorizeRequests()
+                    .antMatchers("/lti/**").permitAll()
+                    .antMatchers("/app/**").hasRole(LtiAuthenticationProvider.LTI_USER);
 
             //Need to disable csrf so that we can use POST via REST
             http.csrf().disable();
@@ -44,26 +44,6 @@ public class SecurityConfig {
 
     }
 
-
-    @Configuration
-    @Order(SecurityProperties.BASIC_AUTH_ORDER - 3)
-    public static class RestSecurityConfigurationAdapter extends WebSecurityConfigurerAdapter {
-
-        @Override
-        public void configure(HttpSecurity http) throws Exception {
-            http.requestMatchers().antMatchers("/rest/**")
-                  .and()
-                  .authorizeRequests()
-                  .antMatchers("/rest/**")
-                  .access("hasAuthority('SCOPE_lms:rest') and hasAuthority('ROLE_LMS_REST_ADMINS')")
-                  .and()
-                  .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                  .and()
-                  .oauth2ResourceServer()
-                  .jwt().jwtAuthenticationConverter(new CustomJwtAuthenticationConverter());
-        }
-    }
-
     @Configuration
     @Order(SecurityProperties.BASIC_AUTH_ORDER - 2)
     public static class CatchAllSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -71,9 +51,9 @@ public class SecurityConfig {
         @Override
         public void configure(HttpSecurity http) throws Exception {
             http.requestMatchers().antMatchers("/**")
-                  .and()
-                  .authorizeRequests()
-                  .anyRequest().authenticated();
+                    .and()
+                    .authorizeRequests()
+                    .anyRequest().authenticated();
         }
     }
 }
