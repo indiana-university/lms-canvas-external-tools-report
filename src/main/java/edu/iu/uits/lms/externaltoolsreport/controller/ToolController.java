@@ -100,7 +100,8 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
          List<String[]> rawContents = csvReader.readAll();
          int numRows = rawContents.size();
 
-         if (rawContents == null || rawContents.isEmpty()) {
+         // make sure the file isn't empty and has at least 2 rows (one for header, one for term data)
+         if (rawContents == null || rawContents.isEmpty() || rawContents.size() < 2) {
             model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.noContent", new Object[] {}, Locale.getDefault()));
             return index(model, request);
          } 
