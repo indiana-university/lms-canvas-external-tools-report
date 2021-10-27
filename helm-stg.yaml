@@ -1,13 +1,19 @@
 
 projectedSecret:
   - secret:
-      name: "properties-2021-05-10"
+      name: "properties-2021-06-07"
 
 image:
   tag: unstable-stg
 
 env:
   APP_ENV: stg
+
+activeProfiles: "redis,stg"
+
+serviceAccountName: external-tools-report-stg
+
+cluster: es-test
 
 ingress:
   enabled: true

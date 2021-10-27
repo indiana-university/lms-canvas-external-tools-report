@@ -27,6 +27,9 @@ javaOpts: "-XX:MaxRAMPercentage=90 -XshowSettings:vm"
 
 activeProfiles: "redis"
 
+vault:
+  enabled: true
+
 service:
   type: ClusterIP
   port: 8080

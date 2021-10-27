@@ -1,12 +1,12 @@
 package edu.iu.uits.lms.externaltoolsreport.services;
 
+import edu.iu.uits.lms.externaltoolsreport.config.ToolConfig;
+import edu.iu.uits.lms.externaltoolsreport.controller.ToolController;
 import edu.iu.uits.lms.externaltoolsreport.repository.ExternalToolsDataRepository;
 import edu.iu.uits.lms.externaltoolsreport.service.ExternalToolsReportService;
 import edu.iu.uits.lms.lti.LTIConstants;
 import edu.iu.uits.lms.lti.security.LtiAuthenticationProvider;
 import edu.iu.uits.lms.lti.security.LtiAuthenticationToken;
-import edu.iu.uits.lms.externaltoolsreport.config.ToolConfig;
-import edu.iu.uits.lms.externaltoolsreport.controller.ToolController;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
