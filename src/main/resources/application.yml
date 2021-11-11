@@ -35,9 +35,10 @@ spring:
     password: ${lms.db.password}
     type: org.springframework.jdbc.datasource.DriverManagerDataSource
 
-course-review-form:
+external-tools-report:
   version: @app.version@
   env: ${app.env}
+  reportUsers: "agschmid,wagnermr"
 
 server:
   error:

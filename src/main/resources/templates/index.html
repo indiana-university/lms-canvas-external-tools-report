@@ -7,7 +7,7 @@
 </head>
 <body>
     <div layout:fragment="content">
-        <div th:if="${successMsg}" class="rvt-alert rvt-alert--success rvt-m-bottom-md" role="alertdialog" aria-labelledby="success-alert-title">
+        <div th:if="${successMsg}" class="rvt-alert rvt-alert--success rvt-m-top-md" role="alertdialog" aria-labelledby="success-alert-title">
             <h1 class="rvt-alert__title" id="success-alert-title" th:text="#{externaltools.alert.success}">Success</h1>
             <p class="rvt-alert__message" th:text="${successMsg}">We have success!</p>
             <button type="button" class="rvt-alert__dismiss" data-alert-close>
@@ -37,12 +37,12 @@
                     <label id="deleteTermLabel" class="rvt-m-right-xs rvt-ts-16" for="termToDelete">Term</label>
                     <select name="termToDelete" id="termToDelete" class="rvt-display-inline rvt-width-md rvt-m-right-xs" onchange="termSelect(this)">
                         <option value="">Select a term</option>
-                        <option th:each="term : ${terms}" th:value="${term}" th:text="${term}">term name</option>
+                        <option th:each="term : ${terms}" th:value="${term.termId}" th:text="|${term.termName} (${term.termId})|">term name</option>
                     </select>
     
                     <button id="deleteButton" type="button" class="rvt-button rvt-button--secondary" 
                         th:text="#{externaltools.delete.button}" data-modal-trigger="delete-term-modal"
-                        onClick="deleteConfirmation(this)" th:attr="data-term-name=${term}" disabled />
+                        onClick="deleteConfirmation(this)" disabled />
                 </div>
             </div>
     

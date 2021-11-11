@@ -22,6 +22,8 @@ public interface ExternalToolsDataRepository extends PagingAndSortingRepository<
 
     @Modifying
     @Transactional
-    void deleteTerm(@Param("term") String term);
+    void deleteTerm(@Param("termId") String termId);
+    
+    ExternalToolsData findFirstByTermId(String termId);
 
 }

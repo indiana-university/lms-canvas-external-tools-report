@@ -37,6 +37,11 @@ public class ExternalToolsDataRepositoryTest {
 
    @Autowired
    private ExternalToolsDataRepository externalToolsDataRepository;
+   
+   private static final String FALL="5432";
+   private static final String SPRING="1234";
+   private static final String SUMMER="4321";
+   
 
    @Test
    public void testRead() throws Exception {
@@ -50,7 +55,7 @@ public class ExternalToolsDataRepositoryTest {
    
    @Test
    public void testGetDistinctTermsByCreatedDesc() throws Exception {
-      List<String> expectedTerms = Arrays.asList("Fall 2021", "Summer 2021", "Spring 2021");
+      List<String> expectedTerms = Arrays.asList(FALL, SUMMER, SPRING);
       List<Object[]> results = externalToolsDataRepository.getDistinctTermByCreatedDesc();
       Assert.assertEquals(3, results.size());
       for (int i=0; i < expectedTerms.size(); i++) {

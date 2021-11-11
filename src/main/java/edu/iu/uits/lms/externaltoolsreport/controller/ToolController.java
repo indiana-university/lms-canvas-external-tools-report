@@ -4,6 +4,7 @@ import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import edu.iu.uits.lms.externaltoolsreport.config.ToolConfig;
 import edu.iu.uits.lms.externaltoolsreport.model.ExternalToolsData;
+import edu.iu.uits.lms.externaltoolsreport.model.TermData;
 import edu.iu.uits.lms.externaltoolsreport.service.ExternalToolsReportService;
 import edu.iu.uits.lms.externaltoolsreport.util.ExternalToolsReportUtils;
 import edu.iu.uits.lms.lti.LTIConstants;
@@ -51,6 +52,7 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       campus,
       course_code,
       term,
+      term_id,
       tool,
       placement;
    }
@@ -61,7 +63,7 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       log.debug("in /index");
       LtiAuthenticationToken token = getTokenWithoutContext();
       
-      List<String> terms = externalToolsReportService.getDistinctTerms();
+      List<TermData> terms = externalToolsReportService.getDistinctTerms();
       model.addAttribute("terms", terms);
 
       return new ModelAndView("index");
@@ -77,8 +79,9 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       if (termToDelete == null || termToDelete.isBlank()) {
          model.addAttribute("error", messageSource.getMessage("externaltools.delete.error", new Object[] {}, Locale.getDefault()));
       } else {
+         String termName = externalToolsReportService.getTermName(termToDelete);
          externalToolsReportService.deleteAllRecordsForTerm(termToDelete);
-         model.addAttribute("successMsg", messageSource.getMessage("externaltools.delete.success", new Object[]{termToDelete}, Locale.getDefault()));
+         model.addAttribute("successMsg", messageSource.getMessage("externaltools.delete.success", new Object[]{termName, termToDelete}, Locale.getDefault()));
       }
       
       return index(model, request);
@@ -98,7 +101,6 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       try {
          CSVReader csvReader = new CSVReader(new InputStreamReader(newTermFile.getInputStream()));
          List<String[]> rawContents = csvReader.readAll();
-         int numRows = rawContents.size();
 
          // make sure the file isn't empty and has at least 2 rows (one for header, one for term data)
          if (rawContents == null || rawContents.isEmpty() || rawContents.size() < 2) {
@@ -121,7 +123,13 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
             return index(model, request);
          }
          
-         List<String> existingTerms = externalToolsReportService.getDistinctTerms();
+         List<TermData> existingTerms = externalToolsReportService.getDistinctTerms();
+
+         int numRows = rawContents.size(); 
+         log.debug("Total rows: " + numRows);
+         
+         String fileTermId = null;
+         String fileTermName = null;
          
          List<ExternalToolsData> newData = new ArrayList<>();
          int currRow = 1;
@@ -130,34 +138,72 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
             Map<String, String> csvContent = ExternalToolsReportUtils.createCsvLineDataMap(rawContents, currRow);
 
             // Ensure the canvas id is numeric
-            String canvasIdString = csvContent.get(RequiredHeadings.canvas_id.toString());
+            String canvasIdString = csvContent.get(RequiredHeadings.canvas_id.name());
             if (!NumberUtils.isCreatable(canvasIdString)) {
                model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.nonNumeric", new Object[] {currRow, canvasIdString}, Locale.getDefault()));
                return index(model, request);
             }
             data.setCanvasId(Long.parseLong(canvasIdString));
             
-            data.setSisCourseId(csvContent.get(RequiredHeadings.sis_course_id.toString()));
-            data.setCampus(csvContent.get(RequiredHeadings.campus.toString()));
-            data.setCourseCode(csvContent.get(RequiredHeadings.course_code.toString()));
+            data.setSisCourseId(csvContent.get(RequiredHeadings.sis_course_id.name())); 
+            data.setCampus(csvContent.get(RequiredHeadings.campus.name()));
+            data.setCourseCode(csvContent.get(RequiredHeadings.course_code.name()));
 
-            // Ensure this term isn't already in the database
-            String term = csvContent.get(RequiredHeadings.term.toString());
-            if (existingTerms.stream().anyMatch(s -> s.equalsIgnoreCase(term))) {
-               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.existingTerm", new Object[] {term}, Locale.getDefault()));
+            // Make sure term name is populated since we are using it for the label in the UI
+            String termName = csvContent.get(RequiredHeadings.term.name());
+            if (termName == null || termName.isBlank()) {
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.missingTermName", new Object[] {currRow, canvasIdString}, Locale.getDefault()));
                return index(model, request);
             }
-            data.setTerm(term);
             
-            data.setTool(csvContent.get(RequiredHeadings.tool.toString()));
-            data.setPlacement(csvContent.get(RequiredHeadings.placement.toString()));
+            if (fileTermName == null) {
+               fileTermName = termName;
+            }
+            
+            // make sure the termName is consistent in the file
+            if (!fileTermName.equals(termName)) {
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.differentTermNames", new Object[] {}, Locale.getDefault()));
+               return index(model, request);
+            }
+            data.setTerm(termName);
+
+            // Make sure the termId is populated
+            String termId = csvContent.get(RequiredHeadings.term_id.name());
+            if (termId == null || termId.isBlank()) {
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.missingTermId", new Object[] {currRow, canvasIdString}, Locale.getDefault()));
+               return index(model, request);
+            }
+            
+            if (fileTermId == null) {
+               // We need to make sure there aren't multiple terms in the file.
+               // Ensure this term isn't already in the database
+               fileTermId = termId;
+               if (existingTerms.stream().anyMatch(s -> s.getTermId().equals(termId))) {
+                  model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.existingTerm", new Object[] {termName, termId}, Locale.getDefault()));
+                  return index(model, request);
+               }
+            }
+            
+            if (!fileTermId.equals(termId)) {
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.differentTerms", new Object[] {}, Locale.getDefault()));
+               return index(model, request);
+            }
+            
+            data.setTermId(termId);
+            
+            data.setTool(csvContent.get(RequiredHeadings.tool.name()));
+            data.setPlacement(csvContent.get(RequiredHeadings.placement.name()));
             
             newData.add(data);
             
             currRow++;
          }
          
+         log.debug("Finished processing csv. About to save...");
+         
          externalToolsReportService.saveToolData(newData);
+         
+         log.debug("Data saved successfully");
 
          model.addAttribute("successMsg",  messageSource.getMessage("externaltools.upload.success", new Object[] {}, Locale.getDefault()));
       

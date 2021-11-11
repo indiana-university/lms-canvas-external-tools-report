@@ -5,6 +5,7 @@ import com.github.springtestdbunit.annotation.DatabaseOperation;
 import com.github.springtestdbunit.annotation.DatabaseSetup;
 import com.github.springtestdbunit.annotation.DatabaseTearDown;
 import edu.iu.uits.lms.externaltoolsreport.config.ToolConfig;
+import edu.iu.uits.lms.externaltoolsreport.model.TermData;
 import edu.iu.uits.lms.externaltoolsreport.repository.ExternalToolsDataRepository;
 import edu.iu.uits.lms.externaltoolsreport.service.ExternalToolsReportService;
 import lombok.extern.slf4j.Slf4j;
@@ -46,10 +47,10 @@ public class ExternalToolsReportServiceTest {
    @Test
    public void testGetDistinctTerms() throws Exception {
       List<String> expectedTerms = Arrays.asList("Fall 2021", "Summer 2021", "Spring 2021");
-      List<String> actualTerms = externalToolsReportService.getDistinctTerms();
+      List<TermData> actualTerms = externalToolsReportService.getDistinctTerms();
       Assert.assertEquals(3, actualTerms.size());
       for (int i=0; i < expectedTerms.size(); i++) {
-         Assert.assertEquals(expectedTerms.get(i), actualTerms.get(i));
+         Assert.assertEquals(expectedTerms.get(i), actualTerms.get(i).getTermName());
       }
    }
 

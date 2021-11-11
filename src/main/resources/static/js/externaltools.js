@@ -10,7 +10,8 @@ function termSelect(select) {
 }
 
 function deleteConfirmation(button) {
-    var termName = document.getElementById("termToDelete").value;
+    var termSelect = document.getElementById("termToDelete");
+    var termName = termSelect.options[termSelect.selectedIndex].text;
     var modalText = document.getElementById("modal-text");
     modalText.textContent = "All term data for " + termName + " will be deleted. Would you like to continue?";
 }

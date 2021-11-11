@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
@@ -23,8 +24,8 @@ import java.util.Date;
 @SequenceGenerator(name = "EXTERNAL_TOOLS_DATA_ID_SEQ", sequenceName = "EXTERNAL_TOOLS_DATA_ID_SEQ", allocationSize = 1)
 @NamedQueries({
         @NamedQuery(name = "ExternalToolsData.findByTerm", query = "from ExternalToolsData where term = :term"),
-        @NamedQuery(name = "ExternalToolsData.getDistinctTermByCreatedDesc", query = "SELECT etd.term, MAX(etd.created) FROM ExternalToolsData etd GROUP BY etd.term ORDER BY MAX(etd.created) DESC, etd.term"),
-        @NamedQuery(name = "ExternalToolsData.deleteTerm", query = "DELETE FROM ExternalToolsData WHERE term = :term")
+        @NamedQuery(name = "ExternalToolsData.getDistinctTermByCreatedDesc", query = "SELECT etd.termId, MAX(etd.created) FROM ExternalToolsData etd GROUP BY etd.termId ORDER BY MAX(etd.created) DESC, etd.termId"),
+        @NamedQuery(name = "ExternalToolsData.deleteTerm", query = "DELETE FROM ExternalToolsData WHERE termId = :termId")
 })
 
 @Data
@@ -32,7 +33,7 @@ import java.util.Date;
 public class ExternalToolsData {
 
    @Id
-   @GeneratedValue(generator = "EXTERNAL_TOOLS_DATA_ID_SEQ")
+   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "EXTERNAL_TOOLS_DATA_ID_SEQ")
    @Column(name = "EXTERNAL_TOOLS_DATA_ID")
    private Long id;
    
@@ -47,6 +48,9 @@ public class ExternalToolsData {
 
    @Column(name = "CAMPUS")
    private String campus;
+   
+   @Column(name = "TERM_ID")
+   private String termId;
 
    @Column(name = "TERM")
    private String term;
