@@ -54,7 +54,7 @@ public class ExternalToolsReportLtiController extends LtiController {
 
         String rolesString = "NotAuthorized";
 
-        List<String> allowedUsers = Arrays.asList(toolConfig.getReportUsers());
+        List<String> allowedUsers = toolConfig.getReportUsers();
         if (allowedUsers.contains(userId)) {
             rolesString = "Instructor";
         }

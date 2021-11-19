@@ -6,6 +6,7 @@ import edu.iu.uits.lms.externaltoolsreport.repository.ExternalToolsDataRepositor
 import org.apache.commons.collections4.ListUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,7 +14,7 @@ import java.util.List;
 @Service
 public class ExternalToolsReportService {
     
-    private static final int BATCH_SIZE = 500;
+    private static final int BATCH_SIZE = 50;
     
     @Autowired
     private ExternalToolsDataRepository externalToolsDataRepository;
@@ -39,7 +40,7 @@ public class ExternalToolsReportService {
         if (results != null) {
             for (Object[] result : results) {
                 String termId = (String)result[0];
-                String termName = getTermName(termId);
+                String termName = (String)result[1];
                 TermData term = new TermData(termId, termName);
                 orderedTerms.add(term);
             }
@@ -48,6 +49,7 @@ public class ExternalToolsReportService {
         return orderedTerms;
     }
     
+    @Transactional
     public void saveToolData(List<ExternalToolsData> toolData) {
         List<List<ExternalToolsData>> partitions = ListUtils.partition(toolData, BATCH_SIZE);
         for (List<ExternalToolsData> batch : partitions) {

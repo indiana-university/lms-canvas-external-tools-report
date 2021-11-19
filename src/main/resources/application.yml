@@ -23,6 +23,7 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
+          batch_size:  30
         temp:
           use_jdbc_metadata_defaults: false
       jadira:
