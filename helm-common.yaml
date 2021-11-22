@@ -1,9 +1,9 @@
-nameOverride: microservices-template
+nameOverride: external-tools-report
 
 namespace: ua-vpit--enterprise-systems--lms
 
 image:
-  repository: registry.docker.iu.edu/lms/microservices-template
+  repository: registry.docker.iu.edu/lms/external-tools-report
   tag: unstable
   pullPolicy: Always
 
@@ -26,6 +26,9 @@ imagePullSecrets:
 javaOpts: "-XX:MaxRAMPercentage=90 -XshowSettings:vm"
 
 activeProfiles: "redis"
+
+vault:
+  enabled: true
 
 service:
   type: ClusterIP

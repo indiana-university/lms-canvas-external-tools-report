@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>microservices-template</artifactId>
+    <artifactId>external-tools-report</artifactId>
     <packaging>jar</packaging>
-    <name>microservices-template</name>
+    <name>external-tools-report</name>
     <version>4.0.0-SNAPSHOT</version>
 
     <parent>
         <artifactId>lms2Wow</artifactId>
         <groupId>edu.iu.uits.lms</groupId>
-        <version>4.0.11</version>
+        <version>4.0.12</version>
         <relativePath />
     </parent>
 
@@ -17,11 +17,12 @@
         <app.version>${project.version}</app.version>
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-io.version>2.8.0</commons-io.version>
-        <docker_repository_name>microservices-template</docker_repository_name>
+        <dbunit.version>2.7.0</dbunit.version>
+        <docker_repository_name>external-tools-report</docker_repository_name>
         <docker_tag>stable</docker_tag>
-        <helm_service_name>microservices-template</helm_service_name>
+        <helm_service_name>external-tools-report</helm_service_name>
         <jquery.version>3.5.1</jquery.version>
-        <lms-bom.version>4.0.13</lms-bom.version>
+        <lms-bom.version>4.0.23</lms-bom.version>
     </properties>
 
     <dependencyManagement>
@@ -36,6 +37,10 @@
         </dependencies>
     </dependencyManagement>
     <dependencies>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -73,6 +78,10 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-vault-config</artifactId>
         </dependency>
         <dependency>
             <groupId>edu.iu.uits.lms</groupId>
@@ -118,11 +127,30 @@
             <version>${commons-io.version}</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.github.springtestdbunit</groupId>
+            <artifactId>spring-test-dbunit</artifactId>
+            <version>1.3.0</version>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.dbunit</groupId>
+            <artifactId>dbunit</artifactId>
+            <version>${dbunit.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.1.0</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 
     <build>
-        <finalName>microservices-template</finalName>
+        <finalName>external-tools-report</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -162,7 +190,7 @@
                         <param>postgresql9</param>
                     </dialects>
                     <packages>
-                        <param>edu.iu.uits.lms.microservices-template</param>
+                        <param>edu.iu.uits.lms.external-tools-report</param>
                     </packages>
 <!--                    <persistenceXml>src/main/webapp/META-INF/canvasnotifier-persistence.xml</persistenceXml>-->
                 </configuration>
@@ -196,10 +224,10 @@
                     <exclude>**/*.java</exclude>
                 </excludes>
             </testResource>
-            <testResource>
-                <filtering>false</filtering>
-                <directory>${project.build.directory}/impl-resources</directory>
-            </testResource>
+<!--            <testResource>-->
+<!--                <filtering>false</filtering>-->
+<!--                <directory>${project.build.directory}/impl-resources</directory>-->
+<!--            </testResource>-->
         </testResources>
     </build>
 

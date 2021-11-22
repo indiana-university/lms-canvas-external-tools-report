@@ -1,6 +1,6 @@
 spring:
   application:
-    name: microservices-template
+    name: external-tools-report
   profiles:
     active: redis
   session:
@@ -13,9 +13,33 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${oauth.tokenprovider.url}/.well-known/jwks.json
-microservices-template:
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+          batch_size:  30
+        temp:
+          use_jdbc_metadata_defaults: false
+      jadira:
+        usertype:
+          autoRegisterUserTypes: true
+  datasource:
+    driverClassName: ${lms.db.driverClass}
+    url: ${lms.db.url}
+    username: ${lms.db.user}
+    password: ${lms.db.password}
+    type: org.springframework.jdbc.datasource.DriverManagerDataSource
+
+external-tools-report:
   version: @app.version@
   env: ${app.env}
+  reportUsers: "agschmid,wagnermr"
 
 server:
   error:
@@ -31,4 +55,4 @@ spring:
   profiles: redis
   session:
     store-type: redis
-    redis.namespace: microservices-template-${app.version}:session
+    redis.namespace: external-tools-report-${app.version}:session
