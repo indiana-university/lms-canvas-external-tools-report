@@ -55,8 +55,6 @@ public class ExternalToolsReportService {
         for (List<ExternalToolsData> batch : partitions) {
             externalToolsDataRepository.saveAll(batch);
         }
-
-        //externalToolsDataRepository.saveAll(toolData);
     }
 
     /**
