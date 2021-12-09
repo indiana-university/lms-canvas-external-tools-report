@@ -5,6 +5,10 @@ spring:
     active: redis
   session:
     store-type: none
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
 #  output:
 #    ansi:
 #      enabled: ALWAYS
