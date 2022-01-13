@@ -202,12 +202,13 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
                return index(model, request);
             }
 
-            // Ensure the count is numeric
-            if (!NumberUtils.isCreatable(countsString)) {
+            // Ensure the count is an integer
+            try {
+               data.setCounts(Integer.parseInt(countsString));
+            } catch (NumberFormatException nfe) {
                model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.nonNumeric.counts", new Object[] {currRow, countsString}, Locale.getDefault()));
                return index(model, request);
             }
-            data.setCounts(Integer.parseInt(countsString));
             
             newData.add(data);
             
