@@ -54,7 +54,8 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       term,
       term_id,
       tool,
-      placement;
+      placement,
+      counts;
    }
 
    @RequestMapping("/index")
@@ -140,7 +141,7 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
             // Ensure the canvas id is numeric
             String canvasIdString = csvContent.get(RequiredHeadings.canvas_id.name());
             if (!NumberUtils.isCreatable(canvasIdString)) {
-               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.nonNumeric", new Object[] {currRow, canvasIdString}, Locale.getDefault()));
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.nonNumeric.canvasId", new Object[] {currRow, canvasIdString}, Locale.getDefault()));
                return index(model, request);
             }
             data.setCanvasId(Long.parseLong(canvasIdString));
@@ -193,6 +194,21 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
             
             data.setTool(csvContent.get(RequiredHeadings.tool.name()));
             data.setPlacement(csvContent.get(RequiredHeadings.placement.name()));
+
+            // Counts must be populated
+            String countsString = csvContent.get(RequiredHeadings.counts.name());
+            if (countsString == null || countsString.trim().isBlank()) {
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.missingCounts", new Object[] {currRow, canvasIdString}, Locale.getDefault()));
+               return index(model, request);
+            }
+
+            // Ensure the count is an integer
+            try {
+               data.setCounts(Integer.parseInt(countsString));
+            } catch (NumberFormatException nfe) {
+               model.addAttribute("error", messageSource.getMessage("externaltools.upload.error.nonNumeric.counts", new Object[] {currRow, countsString}, Locale.getDefault()));
+               return index(model, request);
+            }
             
             newData.add(data);
             
