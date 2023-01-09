@@ -1,23 +1,9 @@
 spring:
   application:
     name: external-tools-report
-  profiles:
-    active: redis
   session:
     store-type: none
-  servlet:
-    multipart:
-      max-file-size: 25MB
-      max-request-size: 25MB
-#  output:
-#    ansi:
-#      enabled: ALWAYS
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: ${oauth.tokenprovider.url}/.well-known/jwks.json
-
+  config.import: optional:${app.fullFilePath}/${app.overridesFileName}, optional:${app.fullFilePath}/security.properties, classpath:canvas.properties, optional:classpath:git.properties, classpath:lti-registrations.properties
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
@@ -27,23 +13,30 @@ spring:
         jdbc:
           lob:
             non_contextual_creation: true
-          batch_size:  30
         temp:
           use_jdbc_metadata_defaults: false
       jadira:
         usertype:
           autoRegisterUserTypes: true
   datasource:
-    driverClassName: ${lms.db.driverClass}
     url: ${lms.db.url}
     username: ${lms.db.user}
     password: ${lms.db.password}
-    type: org.springframework.jdbc.datasource.DriverManagerDataSource
-
+    type: ${lms.db.poolType}
+  cloud.vault.enabled: false
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: ${oauth.tokenprovider.url}/.well-known/jwks.json
 external-tools-report:
   version: @app.version@
   env: ${app.env}
-  reportUsers: "agschmid,wagnermr"
+  reportUsers: ""
 
 server:
   error:
@@ -53,10 +46,41 @@ server:
     session:
       timeout: 30m
 
+app:
+  env: dev
+  fullFilePath: file:/usr/src/app/config
+  overridesFileName: overrides.properties
+
+management:
+  endpoint.info.enabled: true
+  endpoints.web.exposure.include: health,info
+  health.redis.enabled: false
+
+springdoc:
+  api-docs.enabled: false
+  swagger-ui.enabled: false
 ---
 
 spring:
-  profiles: redis
+  config.activate.on-profile: redis-session
   session:
     store-type: redis
-    redis.namespace: external-tools-report-${app.version}:session
+    redis.namespace: external-tools-report-@app.version@:session
+management.health.redis.enabled: true
+
+---
+
+spring:
+  config:
+    activate.on-profile: vault
+    import: vault://
+  cloud.vault:
+    enabled: true
+    config:
+      lifecycle.lease-endpoints: sysleases
+    generic:
+      enabled: false
+    kv:
+      enabled: true
+      backend: ua-vpit/enterprise-systems/lms/kv
+      application-name: external-tools-report

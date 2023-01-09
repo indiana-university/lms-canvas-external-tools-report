@@ -1,5 +1,38 @@
 package edu.iu.uits.lms.externaltoolsreport.controller;
 
+/*-
+ * #%L
+ * external-tools-report
+ * %%
+ * Copyright (C) 2022 - 2023 Indiana University
+ * %%
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ * 
+ * 1. Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
+ * 
+ * 2. Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ * 
+ * 3. Neither the name of the Indiana University nor the names of its contributors
+ *    may be used to endorse or promote products derived from this software without
+ *    specific prior written permission.
+ * 
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ * IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+ * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+ * OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ * #L%
+ */
+
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvException;
 import edu.iu.uits.lms.externaltoolsreport.config.ToolConfig;
@@ -8,8 +41,7 @@ import edu.iu.uits.lms.externaltoolsreport.model.TermData;
 import edu.iu.uits.lms.externaltoolsreport.service.ExternalToolsReportService;
 import edu.iu.uits.lms.externaltoolsreport.util.ExternalToolsReportUtils;
 import edu.iu.uits.lms.lti.LTIConstants;
-import edu.iu.uits.lms.lti.controller.LtiAuthenticationTokenAwareController;
-import edu.iu.uits.lms.lti.security.LtiAuthenticationToken;
+import edu.iu.uits.lms.lti.controller.OidcTokenAwareController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +54,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import uk.ac.ox.ctl.lti13.security.oauth2.client.lti.authentication.OidcAuthenticationToken;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -35,7 +68,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/app")
 @Slf4j
-public class ToolController extends LtiAuthenticationTokenAwareController {
+public class ToolController extends OidcTokenAwareController {
 
    @Autowired
    private ToolConfig toolConfig = null;
@@ -58,11 +91,11 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       counts;
    }
 
-   @RequestMapping("/index")
+   @RequestMapping({"/index", "/launch"})
    @Secured(LTIConstants.INSTRUCTOR_AUTHORITY)
    public ModelAndView index(Model model, HttpServletRequest request) {
       log.debug("in /index");
-      LtiAuthenticationToken token = getTokenWithoutContext();
+      OidcAuthenticationToken token = getTokenWithoutContext();
       
       List<TermData> terms = externalToolsReportService.getDistinctTerms();
       model.addAttribute("terms", terms);
@@ -71,24 +104,24 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
    }
    
 
-   @RequestMapping(value = "/externaltools", params="action=delete", method = RequestMethod.POST)
+   @RequestMapping(value = "/delete", method = RequestMethod.POST)
    @Secured(LTIConstants.INSTRUCTOR_AUTHORITY)
    public ModelAndView delete(Model model, 
                               HttpServletRequest request,
-                              @RequestParam("termToDelete") String termToDelete) {
+                              @RequestParam("submittedTermToDelete") String submittedTermToDelete) {
       
-      if (termToDelete == null || termToDelete.isBlank()) {
+      if (submittedTermToDelete == null || submittedTermToDelete.isBlank()) {
          model.addAttribute("error", messageSource.getMessage("externaltools.delete.error", new Object[] {}, Locale.getDefault()));
       } else {
-         String termName = externalToolsReportService.getTermName(termToDelete);
-         externalToolsReportService.deleteAllRecordsForTerm(termToDelete);
-         model.addAttribute("successMsg", messageSource.getMessage("externaltools.delete.success", new Object[]{termName, termToDelete}, Locale.getDefault()));
+         String termName = externalToolsReportService.getTermName(submittedTermToDelete);
+         externalToolsReportService.deleteAllRecordsForTerm(submittedTermToDelete);
+         model.addAttribute("successMsg", messageSource.getMessage("externaltools.delete.success", new Object[]{termName, submittedTermToDelete}, Locale.getDefault()));
       }
       
       return index(model, request);
    }
 
-   @RequestMapping(value = "/externaltools", params="action=upload", method = RequestMethod.POST)
+   @RequestMapping(value = "/upload", method = RequestMethod.POST)
    @Secured(LTIConstants.INSTRUCTOR_AUTHORITY)
    public ModelAndView uploadNewTerm(Model model, 
                                      HttpServletRequest request,
