@@ -1,0 +1,30 @@
+{
+  "title": "External Tools Data",
+  "description": "LTI tool for collecting external tool data for reporting.",
+  "oidc_initiation_url": "http://localhost:8080/lti/login_initiation/lms_lti_external_tools_report",
+  "target_link_uri": "http://localhost:8080/app/launch",
+  "extensions": [
+    {
+      "domain": "localhost",
+      "platform": "canvas.instructure.com",
+      "privacy_level": "public",
+      "not_selectable": true,
+      "settings": {
+        "placements": [
+          {
+            "enabled": true,
+            "placement": "course_navigation",
+            "message_type": "LtiResourceLinkRequest",
+            "visibility": "admins",
+            "default": "disabled"
+          }
+        ]
+      }
+    }
+  ],
+  "public_jwk_url": "http://localhost:8080/.well-known/jwks.json",
+  "custom_fields": {
+    "instructure_membership_roles": "$com.Instructure.membership.roles",
+    "canvas_user_login_id": "$Canvas.user.loginId"
+  }
+}

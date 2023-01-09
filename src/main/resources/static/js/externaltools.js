@@ -14,21 +14,31 @@ function deleteConfirmation(button) {
     var termName = termSelect.options[termSelect.selectedIndex].text;
     var modalText = document.getElementById("modal-text");
     modalText.textContent = "All term data for " + termName + " will be deleted. Would you like to continue?";
+    document.getElementById("submittedTermToDelete").value = termSelect.value;
 }
 
 function addLoadingIndicator(button) {
+    var contents = document.getElementsByClassName("button-content");
+    var loaders = document.getElementsByClassName("button-loader");
+
+    for (var i=0; i < contents.length; i++) {
+        contents[i].classList.add("rvt-button__content");
+    }
     button.classList.add("rvt-button--loading");
     button.setAttribute("aria-busy", "true");
-    
-    if (button.dataset.action != null) {
-        document.getElementById("submitAction").value = button.dataset.action;
+
+    for (var i=0; i < loaders.length; i++) {
+        loaders[i].classList.remove("rvt-display-none");
     }
-    
+
     var buttons = document.getElementsByClassName("modal-button");
     for (var i=0; i < buttons.length; i++) {
         buttons[i].setAttribute("disabled", "disabled");
     }
-    
-    // FF doesn't need this, but Chrome and Edge do
-    button.form.submit();
+
+    if (button.dataset.action == "upload") {
+        document.getElementById("uploadForm").submit();
+    } else {
+        document.getElementById("deleteForm").submit();
+    }
 }

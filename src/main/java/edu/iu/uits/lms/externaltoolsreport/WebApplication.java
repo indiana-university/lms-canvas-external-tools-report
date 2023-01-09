@@ -1,6 +1,6 @@
 package edu.iu.uits.lms.externaltoolsreport;
 
-import canvas.config.EnableCanvasClient;
+import edu.iu.uits.lms.canvas.config.EnableCanvasClient;
 import edu.iu.uits.lms.common.samesite.EnableCookieFilter;
 import edu.iu.uits.lms.common.server.GitRepositoryState;
 import edu.iu.uits.lms.common.server.ServerInfo;
@@ -15,18 +15,15 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.PropertySource;
 
 import java.util.Date;
 
 @SpringBootApplication
 @EnableGlobalErrorHandler
-@PropertySource(value = {"classpath:env.properties",
-      "${app.fullFilePath}/security.properties"}, ignoreResourceNotFound = true)
 @Slf4j
 @EnableRedisConfiguration
 @EnableCookieFilter(ignoredRequestPatterns = {"/rest/**"})
-@EnableLtiClient
+@EnableLtiClient(toolKeys = {"lms_lti_external_tools_report"})
 @EnableCanvasClient
 @EnableConfigurationProperties(GitRepositoryState.class)
 public class WebApplication {

@@ -8,8 +8,7 @@ import edu.iu.uits.lms.externaltoolsreport.model.TermData;
 import edu.iu.uits.lms.externaltoolsreport.service.ExternalToolsReportService;
 import edu.iu.uits.lms.externaltoolsreport.util.ExternalToolsReportUtils;
 import edu.iu.uits.lms.lti.LTIConstants;
-import edu.iu.uits.lms.lti.controller.LtiAuthenticationTokenAwareController;
-import edu.iu.uits.lms.lti.security.LtiAuthenticationToken;
+import edu.iu.uits.lms.lti.controller.OidcTokenAwareController;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import uk.ac.ox.ctl.lti13.security.oauth2.client.lti.authentication.OidcAuthenticationToken;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -35,7 +35,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/app")
 @Slf4j
-public class ToolController extends LtiAuthenticationTokenAwareController {
+public class ToolController extends OidcTokenAwareController {
 
    @Autowired
    private ToolConfig toolConfig = null;
@@ -58,11 +58,11 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
       counts;
    }
 
-   @RequestMapping("/index")
+   @RequestMapping({"/index", "/launch"})
    @Secured(LTIConstants.INSTRUCTOR_AUTHORITY)
    public ModelAndView index(Model model, HttpServletRequest request) {
       log.debug("in /index");
-      LtiAuthenticationToken token = getTokenWithoutContext();
+      OidcAuthenticationToken token = getTokenWithoutContext();
       
       List<TermData> terms = externalToolsReportService.getDistinctTerms();
       model.addAttribute("terms", terms);
@@ -71,24 +71,24 @@ public class ToolController extends LtiAuthenticationTokenAwareController {
    }
    
 
-   @RequestMapping(value = "/externaltools", params="action=delete", method = RequestMethod.POST)
+   @RequestMapping(value = "/delete", method = RequestMethod.POST)
    @Secured(LTIConstants.INSTRUCTOR_AUTHORITY)
    public ModelAndView delete(Model model, 
                               HttpServletRequest request,
-                              @RequestParam("termToDelete") String termToDelete) {
+                              @RequestParam("submittedTermToDelete") String submittedTermToDelete) {
       
-      if (termToDelete == null || termToDelete.isBlank()) {
+      if (submittedTermToDelete == null || submittedTermToDelete.isBlank()) {
          model.addAttribute("error", messageSource.getMessage("externaltools.delete.error", new Object[] {}, Locale.getDefault()));
       } else {
-         String termName = externalToolsReportService.getTermName(termToDelete);
-         externalToolsReportService.deleteAllRecordsForTerm(termToDelete);
-         model.addAttribute("successMsg", messageSource.getMessage("externaltools.delete.success", new Object[]{termName, termToDelete}, Locale.getDefault()));
+         String termName = externalToolsReportService.getTermName(submittedTermToDelete);
+         externalToolsReportService.deleteAllRecordsForTerm(submittedTermToDelete);
+         model.addAttribute("successMsg", messageSource.getMessage("externaltools.delete.success", new Object[]{termName, submittedTermToDelete}, Locale.getDefault()));
       }
       
       return index(model, request);
    }
 
-   @RequestMapping(value = "/externaltools", params="action=upload", method = RequestMethod.POST)
+   @RequestMapping(value = "/upload", method = RequestMethod.POST)
    @Secured(LTIConstants.INSTRUCTOR_AUTHORITY)
    public ModelAndView uploadNewTerm(Model model, 
                                      HttpServletRequest request,

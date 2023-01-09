@@ -7,112 +7,119 @@
 </head>
 <body>
     <div layout:fragment="content">
-        <div th:if="${successMsg}" class="rvt-alert rvt-alert--success rvt-m-top-md" role="alertdialog" aria-labelledby="success-alert-title">
-            <h1 class="rvt-alert__title" id="success-alert-title" th:text="#{externaltools.alert.success}">Success</h1>
+        <div th:if="${successMsg}" class="rvt-alert rvt-alert--success [ rvt-m-top-md ]" role="alert" aria-labelledby="success-alert-title" data-rvt-alert="success">
+            <div class="rvt-alert__title" id="success-alert-title" th:text="#{externaltools.alert.success}">Success</div>
             <p class="rvt-alert__message" th:text="${successMsg}">We have success!</p>
             <button type="button" class="rvt-alert__dismiss" data-alert-close>
-                <span class="v-hide">Dismiss this alert</span>
+                <span class="rvt-sr-only">Dismiss this alert</span>
                 <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
                     <path fill="currentColor" d="M9.41,8l5.29-5.29a1,1,0,0,0-1.41-1.41L8,6.59,2.71,1.29A1,1,0,0,0,1.29,2.71L6.59,8,1.29,13.29a1,1,0,1,0,1.41,1.41L8,9.41l5.29,5.29a1,1,0,0,0,1.41-1.41Z"/>
                 </svg>
             </button>
         </div>
-        <div th:if="${error}" class="rvt-alert rvt-alert--danger" role="alert" aria-labelledby="error-alert-title">
-            <h1 class="rvt-alert__title" id="danger-alert-title" th:text="#{externaltools.alert.error}">Error</h1>
+        <div th:if="${error}" class="rvt-alert rvt-alert--danger [ rvt-m-top-md ]" role="alert" aria-labelledby="error-alert-title" data-rvt-alert="error">
+            <div class="rvt-alert__title" id="danger-alert-title" th:text="#{externaltools.alert.error}">Error</div>
             <p class="rvt-alert__message format-string" th:text="${error}">An error has occurred</p>
         </div>
         
-        <h1 class="rvt-ts-32 rvt-p-top-sm rvt-text-bold" th:text="#{externaltools.title}">External Tools Report!</h1>
+        <h1 id="etrTitle" class="rvt-ts-32 rvt-p-top-sm" th:text="#{externaltools.title}">External Tools Report!</h1>
 
-        <form id="toolDataForm" th:action="@{/app/externaltools}" method="post" enctype="multipart/form-data">
-
-            <button type="button" class="rvt-m-tb-sm rvt-button" th:text="#{externaltools.addTerm.link}" data-modal-trigger="add-term-modal"   />
+        <button type="button" class="rvt-m-tb-sm rvt-button" th:text="#{externaltools.addTerm.link}" data-rvt-dialog-trigger="add-term-modal" />
             
-            <p class="rvt-ts-18 no-terms" th:text="#{externaltools.noTerms}" th:if="${terms.isEmpty()}">There are no terms yet!</p>
-    
-            <div th:unless="${terms.isEmpty()}">
-                <h2 class="rvt-ts-23 rvt-p-tb-sm rvt-text-bold">Delete Term Data</h2>
+        <p class="rvt-ts-18 no-terms" th:text="#{externaltools.noTerms}" th:if="${terms.isEmpty()}">There are no terms yet!</p>
 
-                <div class="rvt-m-left-xs">
-                    <label id="deleteTermLabel" class="rvt-m-right-xs rvt-ts-16" for="termToDelete">Term</label>
-                    <select name="termToDelete" id="termToDelete" class="rvt-display-inline rvt-width-md rvt-m-right-xs" onchange="termSelect(this)">
-                        <option value="">Select a term</option>
-                        <option th:each="term : ${terms}" th:value="${term.termId}" th:text="|${term.termName} (${term.termId})|">term name</option>
-                    </select>
-    
-                    <button id="deleteButton" type="button" class="rvt-button rvt-button--secondary" 
-                        th:text="#{externaltools.delete.button}" data-modal-trigger="delete-term-modal"
+        <div th:unless="${terms.isEmpty()}">
+            <h2 class="rvt-ts-23 rvt-p-tb-sm">Delete Term Data</h2>
+            <label id="deleteTermLabel" class="rvt-label rvt-text-bold" for="termToDelete">Term</label>
+            <div class="rvt-flex">
+                <select name="termToDelete" id="termToDelete" class="rvt-select rvt-width-md rvt-m-right-xs" onchange="termSelect(this)">
+                    <option value="">Select a term</option>
+                    <option th:each="term : ${terms}" th:value="${term.termId}" th:text="|${term.termName} (${term.termId})|">term name</option>
+                </select>
+
+                <button id="deleteButton" type="button" class="rvt-button rvt-button--secondary"
+                        th:text="#{externaltools.delete.button}" data-rvt-dialog-trigger="delete-term-modal"
                         onClick="deleteConfirmation(this)" disabled />
-                </div>
             </div>
-    
-            <div class="rvt-modal"
-                 id="delete-term-modal"
-                 role="dialog"
-                 aria-labelledby="delete-term-title"
-                 aria-hidden="true"
-                 tabindex="-1"
-                 data-modal-dialog="true">
-                <div class="rvt-modal__inner">
-                    <h1 class="rvt-modal__header rvt-modal__title" id="delete-term-title" th:text="#{externaltools.deleteHeading}">Delete term!</h1>
-                    <div class="rvt-modal__body">
-                        <p id="modal-text">
-                            All data for this term will be deleted.  Would you like to continue?
-                        </p>
-                    </div>
-                    <div class="rvt-modal__controls">
-                        <button class="rvt-button modal-submit modal-button" data-action="delete" onClick="addLoadingIndicator(this)">
-                            <div class="rvt-loader rvt-loader--xs" aria-label="Content loading"></div>
-                            <span class="rvt-button__content" th:text="#{externaltools.modal.deleteConfirm}">Yes</span>
-                        </button>
-                        <button type="button" class="rvt-button rvt-button--secondary modal-button" 
-                                data-modal-close="delete-term-modal" th:text="#{externaltools.modal.no}">No, thanks</button>
-                    </div>
-                </div>
-            </div>
+        </div>
 
-            <div class="rvt-modal"
-                 id="add-term-modal"
-                 role="dialog"
-                 aria-labelledby="add-term-title"
-                 aria-hidden="true"
-                 tabindex="-1">
-                <div class="rvt-modal__inner">
-                    <h1 class="rvt-modal__header rvt-modal__title" id="add-term-title" th:text="#{externaltools.newTerm.heading}">Add term!</h1>
-                    <div class="rvt-modal__body">
-                        <div class="rvt-file" data-upload="newTermFile">
-                            <input type="file" id="newTermFile" name="newTermFile" aria-describedby="file-description">
-                            <label for="newTermFile" class="rvt-button">
-                                <span th:text="#{externaltools.newTerm.upload}">Upload a file</span>
-                                <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                                    <path fill="currentColor" d="M10.41,1H3.5A1.3,1.3,0,0,0,2.2,2.3V13.7A1.3,1.3,0,0,0,3.5,15h9a1.3,1.3,0,0,0,1.3-1.3V4.39ZM11.8,5.21V6H9.25V3h.34ZM4.2,13V3h3V6.75A1.25,1.25,0,0,0,8.5,8h3.3v5Z"/>
-                                </svg>
-                            </label>
-                            <div class="rvt-file__preview" data-file-preview="newTermFile" id="file-description">
-                                No file selected
-                            </div>
+        <div class="rvt-dialog"
+             id="delete-term-modal"
+             role="dialog"
+             aria-labelledby="delete-term-title"
+             aria-describedby="modal-text"
+             hidden
+             tabindex="-1"
+             data-rvt-dialog="delete-term-modal"
+             data-rvt-dialog-modal
+             data-rvt-dialog-darken-page
+             data-rvt-dialog-disable-page-interaction>
+            <header class="rvt-dialog__header">
+                <h1 class="rvt-dialog__title" id="delete-term-title" th:text="#{externaltools.deleteHeading}">Delete term!</h1>
+            </header>
+            <form id="deleteForm" th:action="@{/app/delete}" method="post" enctype="multipart/form-data">
+                <div class="rvt-dialog__body">
+                    <p id="modal-text">
+                        All data for this term will be deleted. Would you like to continue?
+                    </p>
+                </div>
+                <div class="rvt-dialog__controls">
+                    <button class="rvt-button modal-submit modal-button" data-action="delete" onClick="addLoadingIndicator(this)">
+                        <span class="rvt-button__content button-content" th:text="#{externaltools.modal.deleteConfirm}">Submit</span>
+                        <div class="rvt-loader rvt-loader--xs rvt-display-none button-loader" aria-label="Content loading"></div>
+                    </button>
+                    </button>
+                    <button type="button" class="rvt-button rvt-button--secondary modal-button"
+                            data-rvt-dialog-close="delete-term-modal" th:text="#{externaltools.modal.no}">No, thanks</button>
+                </div>
+                <input id="submittedTermToDelete" type="hidden" name="submittedTermToDelete" />
+            </form>
+        </div>
+
+        <div class="rvt-dialog"
+             id="add-term-modal"
+             role="dialog"
+             aria-labelledby="add-term-title"
+             hidden
+             tabindex="-1"
+             data-rvt-dialog="add-term-modal"
+             data-rvt-dialog-modal
+             data-rvt-dialog-darken-page
+             data-rvt-dialog-disable-page-interaction>
+            <header class="rvt-dialog__header">
+                <h1 class="rvt-dialog__title" id="add-term-title" th:text="#{externaltools.newTerm.heading}">Add term!</h1>
+            </header>
+            <form id="uploadForm" th:action="@{/app/upload}" method="post" enctype="multipart/form-data">
+                <div class="rvt-dialog__body">
+                    <div class="rvt-file" data-rvt-file-input="newTermFile">
+                        <input type="file" data-rvt-file-input-button="newTermFile" id="newTermFile" name="newTermFile" aria-describedby="file-description">
+                        <label for="newTermFile" class="rvt-button">
+                            <span th:text="#{externaltools.newTerm.upload}">Upload a file</span>
+                            <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                <path fill="currentColor" d="M10.41,1H3.5A1.3,1.3,0,0,0,2.2,2.3V13.7A1.3,1.3,0,0,0,3.5,15h9a1.3,1.3,0,0,0,1.3-1.3V4.39ZM11.8,5.21V6H9.25V3h.34ZM4.2,13V3h3V6.75A1.25,1.25,0,0,0,8.5,8h3.3v5Z"/>
+                            </svg>
+                        </label>
+                        <div class="rvt-file__preview" data-rvt-file-input-preview="newTermFile" id="file-description">
+                            No file selected
                         </div>
                     </div>
-                    <div class="rvt-modal__controls">
-                        <button class="rvt-button modal-submit modal-button" onClick="addLoadingIndicator(this)" data-action="upload">
-                            <div class="rvt-loader rvt-loader--xs" aria-label="Content loading"></div>
-                            <span class="rvt-button__content" th:text="#{externaltools.newTerm.confirm}">Yes!</span>
-                        </button>
-                        <button type="button" class="rvt-button rvt-button--secondary modal-button"
-                                data-modal-close="add-term-modal" th:text="#{externaltools.modal.no}">No, thanks</button>
-                    </div>
-                    <button type="button" class="rvt-button rvt-modal__close modal-button" data-modal-close="add-term-modal">
-                        <span class="rvt-sr-only">Close</span>
-                        <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                            <path fill="currentColor" d="M9.41,8l5.29-5.29a1,1,0,0,0-1.41-1.41L8,6.59,2.71,1.29A1,1,0,0,0,1.29,2.71L6.59,8,1.29,13.29a1,1,0,1,0,1.41,1.41L8,9.41l5.29,5.29a1,1,0,0,0,1.41-1.41Z"/>
-                        </svg>
-                    </button>
                 </div>
-            </div>
-
-            <input id="submitAction" type="hidden" name="action" />
-            
-        </form>
+                <div class="rvt-dialog__controls">
+                    <button class="rvt-button modal-button" data-action="upload" onClick="addLoadingIndicator(this)">
+                        <span class="rvt-button__content button-content" th:text="#{externaltools.newTerm.confirm}">Yes!</span>
+                        <div class="rvt-loader rvt-loader--xs rvt-display-none button-loader" aria-label="Content loading"></div>
+                    </button>
+                    <button type="button" class="rvt-button rvt-button--secondary modal-button"
+                            data-rvt-dialog-close="add-term-modal" th:text="#{externaltools.modal.no}">No, thanks</button>
+                </div>
+                <button type="button" role="button" class="rvt-button rvt-button--plain rvt-dialog__close modal-button" data-rvt-dialog-close="add-term-modal">
+                    <span class="rvt-sr-only">Close</span>
+                    <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                        <path fill="currentColor" d="M9.41,8l5.29-5.29a1,1,0,0,0-1.41-1.41L8,6.59,2.71,1.29A1,1,0,0,0,1.29,2.71L6.59,8,1.29,13.29a1,1,0,1,0,1.41,1.41L8,9.41l5.29,5.29a1,1,0,0,0,1.41-1.41Z" />
+                    </svg>
+                </button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
