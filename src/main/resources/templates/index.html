@@ -57,7 +57,7 @@
             <header class="rvt-dialog__header">
                 <h1 class="rvt-dialog__title" id="delete-term-title" th:text="#{externaltools.deleteHeading}">Delete term!</h1>
             </header>
-            <form id="deleteForm" th:action="@{/app/delete}" method="post" enctype="multipart/form-data">
+            <form id="deleteForm" th:action="@{/app/delete}" method="post">
                 <div class="rvt-dialog__body">
                     <p id="modal-text">
                         All data for this term will be deleted. Would you like to continue?
