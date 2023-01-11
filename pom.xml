@@ -76,7 +76,6 @@
         <jdk.target>17</jdk.target>
         <jquery.version>3.5.1</jquery.version>
         <lms-canvas-services.version>5.0.11</lms-canvas-services.version>
-        <lms-canvas-iu-custom-services.version>5.0.13</lms-canvas-iu-custom-services.version>
         <lms-canvas-common-configuration.version>5.0.10</lms-canvas-common-configuration.version>
         <lms-canvas-lti-framework.version>5.1.20</lms-canvas-lti-framework.version>
         <lms-canvas-rivet.version>5.2.2.0_1</lms-canvas-rivet.version>
@@ -176,18 +175,6 @@
             <groupId>edu.iu.uits.lms</groupId>
             <artifactId>lms-canvas-services</artifactId>
             <version>${lms-canvas-services.version}</version>
-            <type>test-jar</type>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>edu.iu.uits.lms</groupId>
-            <artifactId>lms-canvas-iu-custom-services</artifactId>
-            <version>${lms-canvas-iu-custom-services.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>edu.iu.uits.lms</groupId>
-            <artifactId>lms-canvas-iu-custom-services</artifactId>
-            <version>${lms-canvas-iu-custom-services.version}</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>
@@ -313,7 +300,6 @@
                     </dialects>
                     <packages>
                         <param>edu.iu.uits.lms.externaltoolsreport</param>
-                        <param>edu.iu.uits.lms.iuonly</param>
                         <param>edu.iu.uits.lms.lti</param>
                     </packages>
                 </configuration>
