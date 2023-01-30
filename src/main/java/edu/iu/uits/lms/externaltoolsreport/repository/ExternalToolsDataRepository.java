@@ -49,7 +49,7 @@ public interface ExternalToolsDataRepository extends PagingAndSortingRepository<
 
     /**
      * 
-     * @return List<Object[]> containing the distinct terms with their creation date ordered by date desc
+     * @return {@code List<Object[]>} containing the distinct terms with their creation date ordered by date desc
      */
     List<Object[]> getDistinctTermByCreatedDesc();
 
