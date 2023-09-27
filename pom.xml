@@ -13,7 +13,7 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
-    <version>0.99.0</version>
+    <version>0.99.1-SNAPSHOT</version>
     <description>LTI tool for collecting external tool data for reporting.</description>
     <url>https://github.com/indiana-university/lms-canvas-external-tools-report</url>
     <inceptionYear>2022</inceptionYear>
@@ -49,7 +49,7 @@
         <connection>scm:git:https://github.com/indiana-university/lms-canvas-external-tools-report.git</connection>
         <developerConnection>scm:git:https://github.com/indiana-university/lms-canvas-external-tools-report.git</developerConnection>
         <url>https://github.com/indiana-university/lms-canvas-external-tools-report</url>
-        <tag>external-tools-report-0.99.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <properties>
